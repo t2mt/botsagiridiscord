@@ -13,20 +13,20 @@ namespace BotSagiriDiscord
 {
     public class CommandHandler
     {
-        private readonly DiscordSocketClient clients;
-        private readonly CommandService commands;
+        private DiscordSocketClient clients;
+        private CommandService commands;
 
-        public CommandHandler(DiscordSocketClient Clients,CommandService Commands)
+        public CommandHandler(DiscordSocketClient Clients)
         {
             clients = Clients;
-            commands = Commands;
+            commands = new CommandService();
+
+            commands.AddModulesAsync(Assembly.GetEntryAssembly(),services:null);
+
+            clients.MessageReceived += HandleCommandAsync;
+            commands.AddModuleAsync(typeof(Modules.CommandLines),services:null);
         }
 
-        public async Task InstallCommandsAsync()
-        {
-            clients.MessageReceived += HandleCommandAsync;
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly(),services:null);
-        }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
@@ -36,11 +36,12 @@ namespace BotSagiriDiscord
                 return;
             }
             var context = new SocketCommandContext(clients, message);
+            
             int argPos = 0;
 
             if (message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(clients.CurrentUser,ref argPos) || message.Author.IsBot)
             {
-                var result = await commands.ExecuteAsync(context: context, argPos: argPos, services: null);
+                var result = await commands.ExecuteAsync(context: context, argPos: argPos, services:null);
 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                 {

@@ -12,7 +12,7 @@ namespace BotSagiriDiscord.Modules
         [Command("hello")]
         public async Task Hello()
         {
-            await ReplyAsync("Hi! Chào mừng " + Context.Message.Author.Mention + "đến với N-World");
+            await ReplyAsync("Hi! Chào mừng Onii-chan " + Context.Message.Author.Mention + "đến với N-World");
         }
     }
 }
